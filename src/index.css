@@ -1,0 +1,1390 @@
+@import "tailwindcss";
+
+@custom-variant dark (&:where(.dark, .dark *));
+
+/* ==========================================================================
+   Fluent Design 设计令牌（Design Tokens）
+   - 间距刻度统一使用 4px 基准：4 / 8 / 12 / 16 / 20 / 24 / 32
+   - 圆角刻度：4（控件） / 8（面板） / 12（卡片）
+   - 语义化颜色：所有组件只消费变量，不直接写死色值 → 明暗主题自动一致
+   ========================================================================== */
+:root {
+  color-scheme: light;
+
+  /* —— 底色 / 表面（Mica 云母层次）—— */
+  --app-bg: #f2f3f5;
+  --rail-bg: #f7f8fa;
+  --surface: #ffffff;
+  --surface-2: #f7f8fa;
+  --surface-3: #eef0f4;
+  --surface-hover: #f2f4f7;
+
+  /* —— 描边 —— */
+  --border: #e6e8ee;
+  --border-strong: #d9dce4;
+
+  /* —— 文字（三级层级）—— */
+  --text-1: #1b1c1f;
+  --text-2: #4f545d;
+  --text-3: #8b909a;
+
+  /* —— 主色（Fluent 强调色）—— */
+  --accent: #0f6cbd;
+  --accent-hover: #115ea3;
+  --accent-on: #ffffff;
+  --accent-fg: #0f6cbd;
+  --accent-soft: #ecf4fd;
+  --accent-border: #c6ddf6;
+
+  /* —— 语义色 —— */
+  --success: #107c41;
+  --success-soft: #e9f6ee;
+  --success-border: #bfe3cd;
+  --danger: #c42b1c;
+  --danger-soft: #fdeceb;
+  --danger-border: #f3c9c4;
+
+  /* —— A4 纸张 —— */
+  --paper: #ffffff;
+  --paper-border: #e8eaef;
+  /* 预览用的“凹槽”底色：与纸张拉开一档，让纸面边界清晰 */
+  --well: #f5f6f9;
+
+  /* —— 阴影（细腻、低对比）—— */
+  --shadow-1: 0 1px 2px rgba(16, 24, 40, 0.05), 0 1px 1px rgba(16, 24, 40, 0.03);
+  --shadow-2: 0 2px 8px rgba(16, 24, 40, 0.07), 0 1px 2px rgba(16, 24, 40, 0.04);
+  --shadow-3: 0 12px 32px rgba(16, 24, 40, 0.09), 0 2px 8px rgba(16, 24, 40, 0.05);
+
+  /* —— 圆角 —— */
+  --r-xs: 4px;
+  --r-sm: 6px;
+  --r-md: 8px;
+  --r-lg: 10px;
+  --r-xl: 12px;
+
+  /* —— 焦点环 —— */
+  --ring: 0 0 0 3px color-mix(in srgb, var(--accent) 18%, transparent);
+}
+
+.dark {
+  color-scheme: dark;
+
+  --app-bg: #1b1b1d;
+  --rail-bg: #202022;
+  --surface: #272729;
+  --surface-2: #202022;
+  --surface-3: #323235;
+  --surface-hover: #2f2f32;
+
+  --border: #343438;
+  --border-strong: #45454a;
+
+  --text-1: #f1f2f4;
+  --text-2: #b9bdc4;
+  --text-3: #8b8f96;
+
+  --accent: #2b88d8;
+  --accent-hover: #3a97e8;
+  --accent-on: #ffffff;
+  --accent-fg: #7cc0f7;
+  --accent-soft: #1c2d3e;
+  --accent-border: #2f4c66;
+
+  --success: #54b87e;
+  --success-soft: #172b20;
+  --success-border: #2a4a37;
+  --danger: #ea7c70;
+  --danger-soft: #2e1a18;
+  --danger-border: #52302c;
+
+  --paper: #26262a;
+  --paper-border: #3a3a40;
+  --well: #171719;
+
+  --shadow-1: 0 1px 2px rgba(0, 0, 0, 0.4);
+  --shadow-2: 0 2px 8px rgba(0, 0, 0, 0.45);
+  --shadow-3: 0 14px 34px rgba(0, 0, 0, 0.5);
+}
+
+/* ==========================================================================
+   基础排版
+   ========================================================================== */
+@layer base {
+  html,
+  body,
+  #root {
+    height: 100%;
+  }
+
+  body {
+    margin: 0;
+    font-family: "Segoe UI Variable Text", "Segoe UI", system-ui, -apple-system,
+      "Microsoft YaHei UI", "Microsoft YaHei", "PingFang SC", sans-serif;
+    font-size: 12.5px;
+    line-height: 1.5;
+    color: var(--text-1);
+    background: var(--app-bg);
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
+  ::selection {
+    background: var(--accent-soft);
+    color: var(--accent-fg);
+  }
+
+  * {
+    scrollbar-width: thin;
+    scrollbar-color: var(--border-strong) transparent;
+  }
+
+  ::-webkit-scrollbar {
+    width: 10px;
+    height: 10px;
+  }
+
+  ::-webkit-scrollbar-thumb {
+    background: color-mix(in srgb, var(--border-strong) 88%, transparent);
+    border: 3px solid transparent;
+    background-clip: padding-box;
+    border-radius: 8px;
+  }
+
+  ::-webkit-scrollbar-thumb:hover {
+    background: color-mix(in srgb, var(--text-3) 70%, transparent);
+    border: 3px solid transparent;
+    background-clip: padding-box;
+  }
+
+  ::-webkit-scrollbar-track {
+    background: transparent;
+  }
+}
+
+/* ==========================================================================
+   组件层（放在 components 层，便于用工具类局部覆盖）
+   ========================================================================== */
+@layer components {
+  /* —— 窗口外壳 —— */
+  .win {
+    display: flex;
+    flex-direction: column;
+    height: 100vh;
+    width: 100%;
+    overflow: hidden;
+    background-color: var(--app-bg);
+    /* Mica 质感：极低饱和的两处冷色晕染，避免纯平死板 */
+    background-image: radial-gradient(
+        900px 460px at 4% -10%,
+        color-mix(in srgb, var(--accent) 9%, transparent),
+        transparent 62%
+      ),
+      radial-gradient(
+        700px 380px at 100% 0%,
+        color-mix(in srgb, #8b5cf6 6%, transparent),
+        transparent 58%
+      );
+    background-attachment: fixed;
+  }
+
+  .titlebar {
+    flex: none;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    height: 48px;
+    padding: 0 12px 0 16px;
+    background: color-mix(in srgb, var(--surface) 74%, transparent);
+    backdrop-filter: blur(26px) saturate(150%);
+    -webkit-backdrop-filter: blur(26px) saturate(150%);
+    border-bottom: 1px solid var(--border);
+    user-select: none;
+  }
+
+  .statusbar {
+    flex: none;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    height: 32px;
+    padding: 0 16px;
+    font-size: 11px;
+    color: var(--text-3);
+    background: color-mix(in srgb, var(--surface) 62%, transparent);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border-top: 1px solid var(--border);
+    user-select: none;
+  }
+
+  /* —— 导航 —— */
+  .nav {
+    flex: none;
+    display: flex;
+    flex-direction: column;
+    width: 236px;
+    padding: 16px 8px;
+    gap: 4px;
+    background: var(--rail-bg);
+    border-right: 1px solid var(--border);
+    user-select: none;
+  }
+
+  .nav-label {
+    padding: 0 10px 8px;
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.04em;
+    color: var(--text-3);
+  }
+
+  .nav-item {
+    position: relative;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    width: 100%;
+    height: 36px;
+    padding: 0 10px;
+    border: 1px solid transparent;
+    border-radius: var(--r-sm);
+    font-family: inherit;
+    font-size: 12.5px;
+    font-weight: 500;
+    color: var(--text-2);
+    text-align: left;
+    cursor: pointer;
+    transition: background 0.15s ease, color 0.15s ease;
+  }
+
+  .nav-item:hover {
+    background: var(--surface-3);
+    color: var(--text-1);
+  }
+
+  .nav-item[data-active="true"] {
+    background: var(--accent-soft);
+    color: var(--accent-fg);
+    font-weight: 600;
+  }
+
+  /* Fluent NavigationView 的左侧指示条 */
+  .nav-item[data-active="true"]::before {
+    content: "";
+    position: absolute;
+    left: -8px;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 3px;
+    height: 16px;
+    border-radius: 0 2px 2px 0;
+    background: var(--accent);
+  }
+
+  .nav-item:focus-visible {
+    outline: none;
+    box-shadow: var(--ring);
+  }
+
+  /* —— 内容区 —— */
+  .content {
+    flex: 1;
+    min-width: 0;
+    overflow-y: auto;
+    background: transparent;
+  }
+
+  /* —— 卡片 / 面板 —— */
+  .card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--r-xl);
+    box-shadow: var(--shadow-1);
+  }
+
+  .card-flat {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--r-xl);
+  }
+
+  .card-inset {
+    background: var(--surface-2);
+    border: 1px solid var(--border);
+    border-radius: var(--r-lg);
+  }
+
+  .card-head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    height: 40px;
+    padding: 0 16px;
+    border-bottom: 1px solid var(--border);
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--text-2);
+  }
+
+  /* 列表行分隔线（避免逐行写 divide 工具类） */
+  .list > * + * {
+    border-top: 1px solid var(--border);
+  }
+
+  /* —— 文字层级 —— */
+  .page-title {
+    font-size: 16px;
+    line-height: 24px;
+    font-weight: 650;
+    letter-spacing: -0.01em;
+    color: var(--text-1);
+  }
+
+  .page-sub {
+    margin-top: 4px;
+    max-width: 720px;
+    font-size: 12px;
+    line-height: 18px;
+    color: var(--text-3);
+  }
+
+  .field-label {
+    display: block;
+    margin-bottom: 6px;
+    font-size: 11.5px;
+    font-weight: 500;
+    color: var(--text-2);
+  }
+
+  .meta {
+    font-size: 11px;
+    color: var(--text-3);
+    font-variant-numeric: tabular-nums;
+  }
+
+  .mono {
+    font-family: "Cascadia Mono", "Consolas", ui-monospace, monospace;
+    font-variant-numeric: tabular-nums;
+  }
+
+  /* —— 按钮 —— */
+  .btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    height: 32px;
+    padding: 0 14px;
+    border: 1px solid transparent;
+    border-radius: var(--r-sm);
+    background: transparent;
+    color: var(--text-1);
+    font-family: inherit;
+    font-size: 12.5px;
+    font-weight: 500;
+    line-height: 1;
+    white-space: nowrap;
+    user-select: none;
+    cursor: pointer;
+    transition: background 0.15s ease, border-color 0.15s ease, color 0.15s ease,
+      box-shadow 0.15s ease, transform 0.08s ease;
+  }
+
+  .btn:focus-visible {
+    outline: none;
+    box-shadow: var(--ring);
+  }
+
+  .btn:disabled {
+    cursor: not-allowed;
+  }
+
+  .btn-sm {
+    height: 26px;
+    padding: 0 8px;
+    gap: 4px;
+    border-radius: var(--r-xs);
+    font-size: 11.5px;
+  }
+
+  .btn-lg {
+    height: 36px;
+    padding: 0 18px;
+    border-radius: var(--r-md);
+    font-size: 13px;
+    font-weight: 600;
+  }
+
+  .btn-accent {
+    background: var(--accent);
+    color: var(--accent-on);
+    box-shadow: var(--shadow-1);
+    font-weight: 600;
+  }
+
+  .btn-accent:hover:not(:disabled) {
+    background: var(--accent-hover);
+    box-shadow: var(--shadow-2);
+  }
+
+  .btn-accent:active:not(:disabled) {
+    transform: translateY(1px);
+    box-shadow: none;
+  }
+
+  .btn-accent:disabled {
+    background: var(--surface-3);
+    color: var(--text-3);
+    box-shadow: none;
+  }
+
+  .btn-neutral {
+    background: var(--surface);
+    border-color: var(--border-strong);
+    color: var(--text-1);
+  }
+
+  .btn-neutral:hover:not(:disabled) {
+    background: var(--surface-hover);
+  }
+
+  .btn-neutral:disabled {
+    background: var(--surface-2);
+    color: var(--text-3);
+  }
+
+  .btn-subtle {
+    color: var(--text-2);
+  }
+
+  .btn-subtle:hover:not(:disabled) {
+    background: var(--surface-3);
+    color: var(--text-1);
+  }
+
+  .btn-subtle:disabled {
+    color: var(--text-3);
+    opacity: 0.55;
+  }
+
+  .btn-accent-subtle {
+    color: var(--accent-fg);
+    font-weight: 500;
+  }
+
+  .btn-accent-subtle:hover:not(:disabled) {
+    background: var(--accent-soft);
+  }
+
+  .btn-accent-subtle:disabled {
+    color: var(--text-3);
+    opacity: 0.55;
+  }
+
+  .btn-success {
+    background: var(--success);
+    color: #ffffff;
+    box-shadow: var(--shadow-1);
+    font-weight: 600;
+  }
+
+  .btn-success:hover:not(:disabled) {
+    filter: brightness(1.08);
+    box-shadow: var(--shadow-2);
+  }
+
+  .btn-success:disabled {
+    background: var(--surface-3);
+    color: var(--text-3);
+    box-shadow: none;
+  }
+
+  /* 成功态「已复制」等确认按钮 */
+  .btn-success-soft {
+    background: var(--success-soft);
+    border-color: var(--success-border);
+    color: var(--success);
+    font-weight: 600;
+  }
+
+  .btn-success-soft:hover:not(:disabled) {
+    background: var(--success-soft);
+  }
+
+  .btn-danger-subtle {    color: var(--text-3);
+  }
+
+  .btn-danger-subtle:hover:not(:disabled) {
+    background: var(--danger-soft);
+    color: var(--danger);
+  }
+
+  .btn-danger-subtle:disabled {
+    color: var(--text-3);
+    opacity: 0.5;
+  }
+
+  /* —— 表单控件 —— */
+  .field {
+    width: 100%;
+    height: 32px;
+    padding: 0 10px;
+    border: 1px solid var(--border-strong);
+    border-radius: var(--r-sm);
+    background: var(--surface);
+    color: var(--text-1);
+    font-family: inherit;
+    font-size: 12.5px;
+    outline: none;
+    transition: border-color 0.15s ease, box-shadow 0.15s ease;
+  }
+
+  .field::placeholder {
+    color: var(--text-3);
+  }
+
+  .field:hover:not(:focus) {
+    border-color: var(--text-3);
+  }
+
+  .field:focus {
+    border-color: var(--accent);
+    box-shadow: var(--ring);
+  }
+
+  select.field {
+    appearance: none;
+    padding-right: 30px;
+    background-image: url("data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%238b909a' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 10px center;
+    cursor: pointer;
+  }
+
+  input[type="checkbox"],
+  input[type="radio"] {
+    flex: none;
+    width: 14px;
+    height: 14px;
+    margin: 0;
+    accent-color: var(--accent);
+    cursor: pointer;
+  }
+
+  input[type="range"] {
+    width: 100%;
+    height: 18px;
+    margin: 0;
+    accent-color: var(--accent);
+    cursor: pointer;
+  }
+
+  /* 纯图标按钮（标题栏等） */
+  .icon-btn {
+    display: inline-grid;
+    place-items: center;
+    width: 28px;
+    height: 28px;
+    padding: 0;
+    border: 1px solid transparent;
+    border-radius: var(--r-sm);
+    background: transparent;
+    color: var(--text-2);
+    cursor: pointer;
+    transition: background 0.15s ease, color 0.15s ease;
+  }
+
+  .icon-btn:hover {
+    background: var(--surface-3);
+    color: var(--text-1);
+  }
+
+  .icon-btn:focus-visible {
+    outline: none;
+    box-shadow: var(--ring);
+  }
+
+  /* —— 说明型正文：段间距 6px，与 1.75 行高配合形成稳定的阅读节奏 —— */
+  .prose p + p {
+    margin-top: 6px;
+  }
+
+  /* —— 状态胶囊 —— */  .chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    height: 20px;
+    padding: 0 7px;
+    border: 1px solid transparent;
+    border-radius: var(--r-xs);
+    font-size: 10.5px;
+    font-weight: 500;
+    line-height: 1;
+    white-space: nowrap;
+  }
+
+  .chip-neutral {
+    background: var(--surface-3);
+    color: var(--text-2);
+  }
+
+  .chip-accent {
+    background: var(--accent-soft);
+    border-color: var(--accent-border);
+    color: var(--accent-fg);
+  }
+
+  .chip-success {
+    background: var(--success-soft);
+    border-color: var(--success-border);
+    color: var(--success);
+  }
+
+  .chip-danger {
+    background: var(--danger-soft);
+    border-color: var(--danger-border);
+    color: var(--danger);
+  }
+
+  /* —— 拖放区 —— */
+  .dropzone {
+    border: 1px dashed var(--border-strong);
+    border-radius: var(--r-xl);
+    background: var(--surface);
+    transition: border-color 0.15s ease, background 0.15s ease;
+  }
+
+  .dropzone:hover {
+    border-color: var(--accent);
+    background: color-mix(in srgb, var(--accent) 3%, var(--surface));
+  }
+
+  /* —— A4 纸张 —— */
+  .paper {
+    background: var(--paper);
+    border: 1px solid var(--paper-border);
+    border-radius: var(--r-xs);
+    box-shadow: var(--shadow-2);
+  }
+
+  /* ==========================================================================
+     设置窗口（对齐 Windows 11「设置」的结构与交互）
+     - 模态层 + 顶部标题栏 + 左侧分类导航 + 右侧设置卡片 + 底部完成栏
+     - 行条目统一 60px 最小高度，控件靠右对齐
+     ========================================================================== */
+  .settings-scrim {
+    position: fixed;
+    inset: 0;
+    z-index: 60;
+    display: grid;
+    place-items: center;
+    padding: 24px;
+    background: rgba(16, 24, 40, 0.34);
+    backdrop-filter: blur(4px);
+    -webkit-backdrop-filter: blur(4px);
+    animation: scrim-in 0.12s ease-out;
+  }
+
+  .settings-window {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    max-width: 980px;
+    height: 100%;
+    max-height: 720px;
+    overflow: hidden;
+    border: 1px solid var(--border-strong);
+    border-radius: var(--r-md);
+    background: var(--surface);
+    box-shadow: var(--shadow-3);
+    animation: settings-in 0.16s cubic-bezier(0.2, 0.8, 0.2, 1);
+  }
+
+  .settings-window:focus {
+    outline: none;
+  }
+
+  .settings-titlebar {
+    flex: none;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    height: 44px;
+    padding: 0 8px 0 16px;
+    border-bottom: 1px solid var(--border);
+    background: color-mix(in srgb, var(--surface) 86%, var(--surface-2));
+    user-select: none;
+  }
+
+  .settings-body {
+    flex: 1;
+    min-height: 0;
+    display: flex;
+  }
+
+  .settings-nav {
+    flex: none;
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    width: 236px;
+    padding: 12px 8px;
+    background: var(--rail-bg);
+    border-right: 1px solid var(--border);
+    user-select: none;
+  }
+
+  .settings-nav-item {
+    position: relative;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    width: 100%;
+    min-height: 42px;
+    padding: 5px 10px;
+    border: 1px solid transparent;
+    border-radius: var(--r-sm);
+    background: transparent;
+    color: var(--text-2);
+    text-align: left;
+    font-family: inherit;
+    font-size: 12.5px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: background 0.15s ease, color 0.15s ease;
+  }
+
+  .settings-nav-item:hover {
+    background: var(--surface-3);
+    color: var(--text-1);
+  }
+
+  .settings-nav-item[data-active="true"] {
+    background: var(--accent-soft);
+    color: var(--accent-fg);
+    font-weight: 600;
+  }
+
+  .settings-nav-item[data-active="true"]::before {
+    content: "";
+    position: absolute;
+    left: -8px;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 3px;
+    height: 18px;
+    border-radius: 0 2px 2px 0;
+    background: var(--accent);
+  }
+
+  .settings-nav-item:focus-visible {
+    outline: none;
+    box-shadow: var(--ring);
+  }
+
+  .settings-pane {
+    flex: 1;
+    min-width: 0;
+    overflow-y: auto;
+    padding: 24px 28px 28px;
+    /* 系统设置的层次：内容区用窗口底色，设置项浮在白色卡片上 */
+    background: var(--app-bg);
+  }
+
+  .pane-head h2 {
+    font-size: 18px;
+    line-height: 26px;
+    font-weight: 650;
+    letter-spacing: -0.01em;
+    color: var(--text-1);
+  }
+
+  .pane-head p {
+    margin-top: 4px;
+    max-width: 620px;
+    font-size: 12px;
+    line-height: 18px;
+    color: var(--text-3);
+  }
+
+  .set-group {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  .set-group-label {
+    padding: 0 2px;
+    font-size: 11.5px;
+    font-weight: 600;
+    color: var(--text-3);
+  }
+
+  .set-card {
+    overflow: hidden;
+    border: 1px solid var(--border);
+    border-radius: var(--r-md);
+    background: var(--surface);
+    box-shadow: var(--shadow-1);
+  }
+
+  .set-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 20px;
+    min-height: 60px;
+    padding: 12px 16px;
+  }
+
+  .set-row + .set-row {
+    border-top: 1px solid var(--border);
+  }
+
+  .set-row-main {
+    min-width: 0;
+  }
+
+  .set-row-title {
+    font-size: 12.5px;
+    font-weight: 600;
+    color: var(--text-1);
+  }
+
+  .set-row-desc {
+    margin-top: 2px;
+    font-size: 11.5px;
+    line-height: 16px;
+    color: var(--text-3);
+  }
+
+  .set-row-ctl {
+    flex: none;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .settings-footer {
+    flex: none;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    height: 56px;
+    padding: 0 16px 0 20px;
+    border-top: 1px solid var(--border);
+    background: var(--surface-2);
+  }
+
+  /* —— 设置项开关（Windows 11 风格拨动开关）—— */
+  .set-switch {
+    position: relative;
+    flex: none;
+    width: 40px;
+    height: 20px;
+    padding: 0;
+    border: 1px solid var(--border-strong);
+    border-radius: 999px;
+    background: var(--surface-3);
+    cursor: pointer;
+    transition: background 0.15s ease, border-color 0.15s ease;
+  }
+
+  .set-switch[data-on="true"] {
+    background: var(--accent);
+    border-color: var(--accent);
+  }
+
+  .set-switch:focus-visible {
+    outline: none;
+    box-shadow: var(--ring);
+  }
+
+  .set-switch-thumb {
+    position: absolute;
+    top: 2px;
+    left: 2px;
+    width: 14px;
+    height: 14px;
+    border-radius: 999px;
+    background: #ffffff;
+    box-shadow: 0 1px 2px rgba(16, 24, 40, 0.25);
+    transition: transform 0.15s ease;
+  }
+
+  .set-switch[data-on="true"] .set-switch-thumb {
+    transform: translateX(20px);
+  }
+
+  /* —— 设置里的可折叠规则说明 —— */
+  .set-details {
+    overflow: hidden;
+    border: 1px solid var(--border);
+    border-radius: var(--r-md);
+    background: var(--surface);
+  }
+
+  .set-details > summary {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    padding: 12px 16px;
+    font-size: 12.5px;
+    font-weight: 600;
+    color: var(--text-2);
+    cursor: pointer;
+    list-style: none;
+    user-select: none;
+  }
+
+  .set-details > summary::-webkit-details-marker {
+    display: none;
+  }
+
+  .set-details > summary:hover {
+    background: var(--surface-hover);
+  }
+
+  .set-details > summary:focus-visible {
+    outline: none;
+    box-shadow: var(--ring);
+  }
+
+  .set-details[open] > summary {
+    border-bottom: 1px solid var(--border);
+  }
+
+  .set-chevron {
+    transition: transform 0.15s ease;
+  }
+
+  .set-details[open] .set-chevron {
+    transform: rotate(180deg);
+  }
+
+  .set-details-body {
+    padding: 16px;
+    background: var(--surface-2);
+  }
+
+  /* ==========================================================================
+     截图裁切排版
+     - 卡片网格 + 红色裁切手柄 + 右侧 A4 预览
+     - 全部使用语义色令牌，明暗主题一致
+     ========================================================================== */
+  .cap-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+    gap: 12px;
+  }
+
+  .cap-card {
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    border: 1px solid var(--border);
+    border-radius: var(--r-lg);
+    background: var(--surface);
+    box-shadow: var(--shadow-1);
+    animation: cap-card-in 0.18s ease-out;
+    transition: box-shadow 0.15s ease, border-color 0.15s ease;
+  }
+
+  .cap-card:hover {
+    border-color: var(--border-strong);
+    box-shadow: var(--shadow-2);
+  }
+
+  .cap-card-head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+    height: 34px;
+    padding: 0 8px 0 12px;
+    border-bottom: 1px solid var(--border);
+    background: var(--surface-2);
+  }
+
+  .cap-stage {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 300px;
+    padding: 10px;
+    background: var(--well);
+    overflow: hidden;
+    user-select: none;
+  }
+
+  .cap-canvas-wrap {
+    position: relative;
+    line-height: 0;
+    touch-action: none;
+  }
+
+  .cap-canvas {
+    display: block;
+    border-radius: 2px;
+    box-shadow: var(--shadow-1);
+  }
+
+  .cap-mask {
+    position: absolute;
+    background: rgba(16, 24, 40, 0.55);
+    pointer-events: none;
+  }
+
+  .dark .cap-mask {
+    background: rgba(0, 0, 0, 0.64);
+  }
+
+  .cap-line {
+    position: absolute;
+    left: 0;
+    right: 0;
+    height: 2px;
+    background: #f43f5e;
+    cursor: ns-resize;
+    z-index: 4;
+    touch-action: none;
+  }
+
+  /* 加宽点击热区，细线也好抓 */
+  .cap-line::before {
+    content: "";
+    position: absolute;
+    left: 0;
+    right: 0;
+    top: -7px;
+    bottom: -7px;
+  }
+
+  .cap-line:focus-visible {
+    outline: none;
+    box-shadow: 0 0 0 2px color-mix(in srgb, #f43f5e 40%, transparent);
+  }
+
+  .cap-handle {
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%);
+    padding: 0 8px;
+    border-radius: 999px;
+    background: #f43f5e;
+    color: #ffffff;
+    font-size: 9px;
+    font-weight: 700;
+    line-height: 14px;
+    letter-spacing: 0.4px;
+    white-space: nowrap;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.35);
+  }
+
+  /* 边界贴到画布边缘时，把胶囊挪到内侧，避免被卡片裁掉 */
+  .cap-handle-t {
+    transform: translate(-50%, 0);
+  }
+
+  .cap-handle-b {
+    transform: translate(-50%, -100%);
+  }
+
+  .cap-handle-l {
+    transform: translate(0, -50%);
+  }
+
+  .cap-handle-r {
+    transform: translate(-100%, -50%);
+  }
+
+  /* 左右裁切手柄：竖向红线 */
+  .cap-guide {
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    width: 2px;
+    background: #f43f5e;
+    cursor: ew-resize;
+    z-index: 4;
+    touch-action: none;
+  }
+
+  .cap-guide::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    left: -7px;
+    right: -7px;
+  }
+
+  .cap-guide:focus-visible {
+    outline: none;
+    box-shadow: 0 0 0 2px color-mix(in srgb, #f43f5e 40%, transparent);
+  }
+
+  /* 左右没裁时胶囊只在悬停/聚焦时出现，避免卡片一进来就挂满四个标签 */
+  .cap-guide .cap-handle {
+    opacity: 0;
+    transition: opacity 0.15s ease;
+  }
+
+  .cap-canvas-wrap:hover .cap-guide .cap-handle,
+  .cap-guide:focus-visible .cap-handle,
+  .cap-guide .cap-handle.is-on {
+    opacity: 1;
+  }
+
+  .cap-card-foot {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    height: 34px;
+    padding: 0 8px 0 12px;
+    border-top: 1px solid var(--border);
+    font-size: 11px;
+    color: var(--text-3);
+  }
+
+  .cap-page {
+    position: relative;
+    display: flex;
+    flex: none;
+    align-items: center;
+    justify-content: center;
+    padding: 0;
+    overflow: hidden;
+    border: 1px solid var(--paper-border);
+    border-radius: 2px;
+    background: var(--paper);
+    box-shadow: var(--shadow-2);
+    cursor: pointer;
+    transition: border-color 0.15s ease, transform 0.15s ease;
+  }
+
+  .cap-page:hover {
+    border-color: var(--accent);
+    transform: translateY(-1px);
+  }
+
+  .cap-page:focus-visible {
+    outline: none;
+    box-shadow: var(--ring);
+  }
+
+  /* 预览里的图片：按版心等比居中，位置由 layoutOnPage 算出 */
+  .cap-page-img {
+    position: absolute;
+    display: block;
+  }
+
+  /* 预览缩放条 */
+  .cap-zoom {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    height: 28px;
+    padding: 0 4px;
+    border: 1px solid var(--border);
+    border-radius: var(--r-md);
+    background: var(--surface-2);
+  }
+
+  .cap-zoom-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 22px;
+    height: 22px;
+    border-radius: var(--r-sm);
+    color: var(--text-2);
+    transition: background 0.15s ease, color 0.15s ease;
+  }
+
+  .cap-zoom-btn:hover:not(:disabled) {
+    background: var(--surface);
+    color: var(--text-1);
+  }
+
+  .cap-zoom-btn:disabled {
+    opacity: 0.35;
+    cursor: not-allowed;
+  }
+
+  .cap-zoom-value {
+    flex: 1;
+    text-align: center;
+    font-size: 11px;
+    font-weight: 600;
+    color: var(--text-2);
+  }
+
+  .cap-zoom-reset {
+    padding: 0 6px;
+    height: 20px;
+    border-radius: var(--r-sm);
+    font-size: 10.5px;
+    color: var(--accent-fg);
+  }
+
+  .cap-zoom-reset:hover:not(:disabled) {
+    background: color-mix(in srgb, var(--accent) 12%, transparent);
+  }
+
+  .cap-zoom-reset:disabled {
+    color: var(--text-3);
+    cursor: default;
+  }
+
+  /* 缩放后出现滚动条，横向也不会撑破侧栏 */
+  .cap-preview-scroll {
+    display: flex;
+    flex-direction: column;
+    /* safe center：放大后超出容器时不会把左侧滚不回来 */
+    align-items: safe center;
+    gap: 10px;
+    max-height: calc(100vh - 292px);
+    padding: 0 2px 2px;
+    overflow: auto;
+    overscroll-behavior: contain;
+  }
+
+  /* 完成动画：勾选弹出 + 按钮脉冲一次 */
+  .cap-flash {
+    display: inline-flex;
+    min-width: 0;
+    align-items: center;
+    gap: 6px;
+    animation: cap-flash-in 0.28s cubic-bezier(0.22, 1, 0.36, 1);
+  }
+
+  .cap-pop {
+    animation: cap-pop 0.36s cubic-bezier(0.22, 1, 0.36, 1);
+  }
+
+  .cap-btn-done {
+    animation: cap-btn-done 0.9s ease-out;
+  }
+
+  .cap-page-num {
+    position: absolute;
+    right: 6px;
+    bottom: 4px;
+    font-size: 9px;
+    color: var(--text-3);
+  }
+
+  /* 拖拽文件到本页时的整体提示 */
+  [data-drag="true"] .dropzone {
+    border-color: var(--accent);
+    background: color-mix(in srgb, var(--accent) 5%, var(--surface));
+  }
+}
+
+@keyframes scrim-in {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes settings-in {
+  from {
+    opacity: 0;
+    transform: translateY(6px) scale(0.99);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .settings-scrim,
+  .settings-window {
+    animation: none;
+  }
+}
+
+/* ==========================================================================
+   动效
+   ========================================================================== */
+@keyframes tab-fade-slide {
+  from {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+@keyframes cap-card-in {
+  from {
+    opacity: 0;
+    transform: translateY(4px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+@keyframes cap-flash-in {
+  from {
+    opacity: 0;
+    transform: translateY(3px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+@keyframes cap-pop {
+  0% {
+    transform: scale(0.6);
+    opacity: 0;
+  }
+  60% {
+    transform: scale(1.12);
+    opacity: 1;
+  }
+  100% {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
+@keyframes cap-btn-done {
+  0% {
+    box-shadow: 0 0 0 0 color-mix(in srgb, var(--success) 55%, transparent);
+  }
+  100% {
+    box-shadow: 0 0 0 9px transparent;
+  }
+}
+
+.tab-enter {
+  animation: tab-fade-slide 0.16s ease-out;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .tab-enter,
+  .cap-flash,
+  .cap-pop,
+  .cap-btn-done,
+  .cap-card {
+    animation: none;
+  }
+}

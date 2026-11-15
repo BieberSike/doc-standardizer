@@ -1,0 +1,14 @@
+node_modules/
+dist/
+build/
+coverage/
+.DS_Store
+*.log
+.env*
+!.env.example
+
+# Windows 快捷方式（含本机绝对路径，不适合入库）
+*.lnk
+
+# 临时目录
+tmp-*/
